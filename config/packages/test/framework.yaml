@@ -1,0 +1,17 @@
+framework:
+    test: true
+    session:
+        storage_id: session.storage.mock_file
+    profiler:
+        collect: false
+    router:
+        strict_requirements: true
+    # Debug modunu devre dışı bırakma
+    default_locale: en
+    trusted_proxies: ~
+    trusted_hosts: ~
+    http_method_override: true
+    ide: null
+    csrf_protection:
+        enabled: true
+    error_controller: 'App\Controller\ErrorController::show'
