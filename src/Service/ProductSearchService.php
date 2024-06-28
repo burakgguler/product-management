@@ -17,7 +17,7 @@ class ProductSearchService
      */
     public function __construct()
     {
-        $this->client = ClientBuilder::create()->setHosts(['localhost:9200'])->build();
+        $this->client = ClientBuilder::create()->setHosts([getenv('ELASTICSEARCH_URL')])->build();
     }
 
     /**
@@ -32,7 +32,7 @@ class ProductSearchService
                 'query' => [
                     'multi_match' => [
                         'query'  => $query,
-                        'fields' => ['id', 'name', 'category', 'sku']
+                        'fields' => ['name', 'category', 'sku']
                     ]
                 ]
             ]

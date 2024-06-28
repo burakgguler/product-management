@@ -1,0 +1,21 @@
+FROM arm64v8/openjdk:11-jre-slim
+
+ENV ELASTIC_VERSION 7.17.9
+
+RUN apt-get update && \
+    apt-get install -y wget && \
+    wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ELASTIC_VERSION-linux-aarch64.tar.gz && \
+    tar -xzf elasticsearch-$ELASTIC_VERSION-linux-aarch64.tar.gz && \
+    mv elasticsearch-$ELASTIC_VERSION /usr/share/elasticsearch && \
+    rm elasticsearch-$ELASTIC_VERSION-linux-aarch64.tar.gz
+
+WORKDIR /usr/share/elasticsearch
+
+RUN groupadd elasticsearch && useradd -g elasticsearch elasticsearch && \
+    chown -R elasticsearch:elasticsearch /usr/share/elasticsearch
+
+USER elasticsearch
+
+EXPOSE 9200 9300
+
+CMD ["./bin/elasticsearch"]

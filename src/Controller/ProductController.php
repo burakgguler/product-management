@@ -6,9 +6,11 @@ use App\Service\ProductSearchService;
 use App\Service\ProductService;
 use App\Validator\ProductValidator;
 use Doctrine\ORM\EntityManagerInterface;
+use Elastic\Elasticsearch\ClientBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -86,5 +88,21 @@ class ProductController extends AbstractController
         $product = $this->productService->createProduct($data);
 
         return $this->json($product, JsonResponse::HTTP_CREATED);
+    }
+
+    #[Route('/test-elasticsearch', name: 'test_elasticsearch', methods: ['GET'])]
+    public function test(): Response
+    {
+        $hosts = [
+            'http://elasticsearch:9200', // Elasticsearch konteynerinin adresi
+        ];
+
+        $client = ClientBuilder::create()->setHosts($hosts)->build();
+
+        $response = $client->ping();
+
+        return new Response(
+            $response ? 'Elasticsearch bağlantısı başarılı' : 'Elasticsearch bağlantısı başarısız'
+        );
     }
 }
