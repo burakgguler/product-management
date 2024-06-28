@@ -30,13 +30,9 @@ class ProductSearchService
             'index' => 'products',
             'body'  => [
                 'query' => [
-                    'bool' => [
-                        'should' => [
-                            ['match' => ['id' => $query]],
-                            ['match' => ['name' => $query]],
-                            ['match' => ['category' => $query]],
-                            ['match' => ['sku' => $query]]
-                        ]
+                    'multi_match' => [
+                        'query'  => $query,
+                        'fields' => ['id', 'name', 'category', 'sku']
                     ]
                 ]
             ]
