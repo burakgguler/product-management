@@ -5,14 +5,11 @@ namespace App\Controller;
 use App\Service\ProductSearchService;
 use App\Service\ProductService;
 use App\Validator\ProductValidator;
-use Doctrine\ORM\EntityManagerInterface;
-use Elastic\Elasticsearch\ClientBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class ProductController extends AbstractController
 {
@@ -20,7 +17,12 @@ class ProductController extends AbstractController
     private $productSearchService;
     private $productValidator;
 
-    public function __construct(ProductService $productService, ProductSearchService $productSearchService, ProductValidator $productValidator)
+    public function __construct
+    (
+        ProductService $productService,
+        ProductSearchService $productSearchService,
+        ProductValidator $productValidator
+    )
     {
         $this->productService = $productService;
         $this->productSearchService = $productSearchService;
@@ -33,16 +35,16 @@ class ProductController extends AbstractController
         $query = $request->query->get('q', '');
 
         if (empty($query)) {
-            return new JsonResponse(['error' => 'Query parameter is required!'], JsonResponse::HTTP_BAD_REQUEST);
+            return $this->json(['error' => 'Query parameter is required!'], Response::HTTP_BAD_REQUEST);
         }
 
         $products = $this->productSearchService->searchProducts($query);
 
         if (empty($products)) {
-            return new JsonResponse(['message' => 'No products found.'], JsonResponse::HTTP_NOT_FOUND);
+            return $this->json(['message' => 'No products found.'], Response::HTTP_NOT_FOUND);
         }
 
-        return new JsonResponse($products);
+        return $this->json($products);
     }
 
     #[Route('/api/products', name: 'get_products', methods: ['GET'])]
@@ -51,10 +53,10 @@ class ProductController extends AbstractController
         $products = $this->productService->getProducts();
 
         if (empty($products)) {
-            return new JsonResponse(['message' => 'No products found.'], JsonResponse::HTTP_NOT_FOUND);
+            return $this->json(['message' => 'No products found.'], Response::HTTP_NOT_FOUND);
         }
 
-        return $this->json($products, JsonResponse::HTTP_OK);
+        return $this->json($products);
     }
 
     #[Route('/api/products/{id}', methods: ['GET'])]
@@ -63,14 +65,14 @@ class ProductController extends AbstractController
         $product = $this->productService->getProductById($id);
 
         if (!$product) {
-            return $this->json(['error' => 'Product not found!'], JsonResponse::HTTP_NOT_FOUND);
+            return $this->json(['error' => 'Product not found!'], Response::HTTP_NOT_FOUND);
         }
 
-        return $this->json($product, JsonResponse::HTTP_OK);
+        return $this->json($product);
     }
 
     #[Route('/api/products', name: 'create_product', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
+    public function create(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -82,27 +84,11 @@ class ProductController extends AbstractController
                 $errorMessages[$field][] = $error->getMessage();
             }
 
-            return new JsonResponse(['errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
+            return $this->json(['errors' => $errorMessages], Response::HTTP_BAD_REQUEST);
         }
 
         $product = $this->productService->createProduct($data);
 
-        return $this->json($product, JsonResponse::HTTP_CREATED);
-    }
-
-    #[Route('/test-elasticsearch', name: 'test_elasticsearch', methods: ['GET'])]
-    public function test(): Response
-    {
-        $hosts = [
-            'http://elasticsearch:9200', // Elasticsearch konteynerinin adresi
-        ];
-
-        $client = ClientBuilder::create()->setHosts($hosts)->build();
-
-        $response = $client->ping();
-
-        return new Response(
-            $response ? 'Elasticsearch bağlantısı başarılı' : 'Elasticsearch bağlantısı başarısız'
-        );
+        return $this->json($product, Response::HTTP_CREATED);
     }
 }

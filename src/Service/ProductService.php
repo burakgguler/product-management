@@ -13,7 +13,7 @@ class ProductService
     private $redisService;
     private $productSearchService;
 
-    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer, RedisService $redisService, ProductSearchService $productSearchService)
+    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer, RedisServiceInterface $redisService, ProductSearchServiceInterface $productSearchService)
     {
         $this->em = $em;
         $this->serializer = $serializer;

@@ -8,7 +8,7 @@ use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elastic\Elasticsearch\Exception\MissingParameterException;
 use Elastic\Elasticsearch\Exception\ServerResponseException;
 
-class ProductSearchService
+class ProductSearchService implements ProductSearchServiceInterface
 {
     private $client;
 

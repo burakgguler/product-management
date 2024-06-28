@@ -4,7 +4,7 @@ namespace App\Service;
 
 use Predis\Client;
 
-class RedisService
+class RedisService implements RedisServiceInterface
 {
     private $client;
 
@@ -13,7 +13,7 @@ class RedisService
         $this->client = new Client($redisHost);
     }
 
-    public function set(string $key, string $value): void
+    public function set(string $key, $value): void
     {
         $this->client->set($key, $value);
     }
