@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\ProductSearchService;
 use App\Service\ProductService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,10 +14,30 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ProductController extends AbstractController
 {
     private $productService;
+    private $productSearchService;
 
-    public function __construct(ProductService $productService)
+    public function __construct(ProductService $productService, ProductSearchService $productSearchService)
     {
         $this->productService = $productService;
+        $this->productSearchService = $productSearchService;
+    }
+
+    #[Route('/api/products/search', name: 'search_products', methods: ['GET'])]
+    public function searchProducts(Request $request): JsonResponse
+    {
+        $query = $request->query->get('q', '');
+
+        if (empty($query)) {
+            return new JsonResponse(['error' => 'Query parameter is required!'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $products = $this->productSearchService->searchProducts($query);
+
+        if (empty($products)) {
+            return new JsonResponse(['message' => 'No products found.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse($products);
     }
 
     #[Route('/api/products', name: 'get_products', methods: ['GET'])]

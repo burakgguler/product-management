@@ -11,12 +11,14 @@ class ProductService
     private $em;
     private $serializer;
     private $redisService;
+    private $productSearchService;
 
-    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer, RedisService $redisService)
+    public function __construct(EntityManagerInterface $em, SerializerInterface $serializer, RedisService $redisService, ProductSearchService $productSearchService)
     {
         $this->em = $em;
         $this->serializer = $serializer;
         $this->redisService = $redisService;
+        $this->productSearchService = $productSearchService;
     }
 
     public function createProduct(array $data): Product
@@ -32,6 +34,7 @@ class ProductService
         $this->em->flush();
 
         $this->storeProductInRedis($product);
+        $this->productSearchService->indexProduct($this->serializer->normalize($product));
 
         return $product;
     }
