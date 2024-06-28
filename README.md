@@ -158,10 +158,3 @@ To run the tests, use the following command:
 ```bash
 docker-compose exec php bin/phpunit
 ```
-
-## Contact
-If you have any problems with running the application, please contact me.
-
-e-mail: burakkguler@outlook.com
-
-mobile: +90 554 320 8843
